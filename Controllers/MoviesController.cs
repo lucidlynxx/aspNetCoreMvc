@@ -1,24 +1,25 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using aspNetCoreMvc.Data;
 using aspNetCoreMvc.Models;
 using Rotativa.AspNetCore;
 using ClosedXML.Excel;
+using aspNetCoreMvc.Interfaces;
 
 namespace aspNetCoreMvc.Controllers
 {
     public class MoviesController : Controller
     {
         private readonly aspNetCoreMvcContext _context;
+        // implementasi pengambilan data menggunakan stored procedure dan ADO.NET
+        private readonly IMovieRepository _movieRepository;
 
-        public MoviesController(aspNetCoreMvcContext context)
+        public MoviesController(aspNetCoreMvcContext context, IMovieRepository movieRepository)
         {
             _context = context;
+            // implementasi pengambilan data menggunakan stored procedure dan ADO.NET
+            _movieRepository = movieRepository;
         }
 
         // GET: Movies
@@ -186,7 +187,8 @@ namespace aspNetCoreMvc.Controllers
 
         public async Task<IActionResult> DownloadPdf()
         {
-            List<Movie> movies = await _context.Movie.ToListAsync();
+            // implementasi pengambilan data menggunakan stored procedure dan ADO.NET
+            List<Movie> movies = await _movieRepository.GetAllMoviesAsync();
 
             var fileName = $"movie_list_{DateTime.Now:yyyy_MM_dd_HH:mm}.pdf";
 
@@ -199,7 +201,8 @@ namespace aspNetCoreMvc.Controllers
 
         public async Task<IActionResult> DownloadExcel()
         {
-            List<Movie> movies = await _context.Movie.ToListAsync();
+            // implementasi pengambilan data menggunakan stored procedure dan ADO.NET
+            List<Movie> movies = await _movieRepository.GetAllMoviesAsync();
 
             using var workbook = new XLWorkbook();
             var worksheet = workbook.Worksheets.Add("Movie List");
