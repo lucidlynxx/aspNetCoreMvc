@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using aspNetCoreMvc.Data;
 using aspNetCoreMvc.Models;
+using Rotativa.AspNetCore;
 
 namespace aspNetCoreMvc.Controllers
 {
@@ -180,6 +181,19 @@ namespace aspNetCoreMvc.Controllers
         private bool MovieExists(int id)
         {
             return _context.Movie.Any(e => e.Id == id);
+        }
+
+        public async Task<IActionResult> DownloadPdf()
+        {
+            List<Movie> movies = await _context.Movie.ToListAsync();
+
+            var fileName = $"movie_list_{DateTime.Now:yyyy_MM_dd_HH:mm}.pdf";
+
+            return new ViewAsPdf("PdfTemplate", movies)
+            {
+                FileName = fileName,
+                PageSize = Rotativa.AspNetCore.Options.Size.A4
+            };
         }
     }
 }

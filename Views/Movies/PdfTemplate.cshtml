@@ -1,0 +1,97 @@
+﻿@model List<Movie>
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Movie List</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+            margin: 20px;
+        }
+
+        h2 {
+            text-align: left;
+            margin-bottom: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th, td {
+            padding: 8px 12px;
+            border: 1px solid #444;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f0f0f0;
+        }
+
+        .footer {
+            margin-top: 30px;
+            font-size: 10px;
+            text-align: right;
+        }
+    </style>
+</head>
+<body>
+    <h2>Movie List</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model![0].Title)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model![0].ReleaseDate)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model![0].Genre)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model![0].Price)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model![0].Rating)
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Title)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.ReleaseDate)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Genre)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Price)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Rating)
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <div class="footer">
+        Generated on @DateTime.Now.ToString("dd MMM yyyy HH:mm")
+    </div>
+</body>
+</html>
