@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using aspNetCoreMvc.Data;
 using aspNetCoreMvc.Models;
 using Rotativa.AspNetCore;
+using ClosedXML.Excel;
 
 namespace aspNetCoreMvc.Controllers
 {
@@ -194,6 +195,43 @@ namespace aspNetCoreMvc.Controllers
                 FileName = fileName,
                 PageSize = Rotativa.AspNetCore.Options.Size.A4
             };
+        }
+
+        public async Task<IActionResult> DownloadExcel()
+        {
+            List<Movie> movies = await _context.Movie.ToListAsync();
+
+            using var workbook = new XLWorkbook();
+            var worksheet = workbook.Worksheets.Add("Movie List");
+            var currentRow = 1;
+
+            // Header
+            worksheet.Cell(currentRow, 1).Value = "No";
+            worksheet.Cell(currentRow, 2).Value = "Title";
+            worksheet.Cell(currentRow, 3).Value = "Release Date";
+            worksheet.Cell(currentRow, 4).Value = "Genre";
+            worksheet.Cell(currentRow, 5).Value = "Price";
+            worksheet.Cell(currentRow, 6).Value = "Rating";
+
+            // Data
+            for (int i = 0; i < movies.Count; i++)
+            {
+                currentRow++;
+                worksheet.Cell(currentRow, 1).Value = i + 1;
+                worksheet.Cell(currentRow, 2).Value = movies[i].Title;
+                worksheet.Cell(currentRow, 3).Value = movies[i].ReleaseDate.ToString("dd MMM yyyy");
+                worksheet.Cell(currentRow, 4).Value = movies[i].Genre;
+                worksheet.Cell(currentRow, 5).Value = movies[i].Price;
+                worksheet.Cell(currentRow, 6).Value = movies[i].Rating;
+            }
+
+            // Download
+            using var stream = new MemoryStream();
+            workbook.SaveAs(stream);
+            stream.Position = 0;
+
+            var fileName = $"movie_list_{DateTime.Now:yyyy_MM_dd_HH:mm}.xlsx";
+            return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
         }
     }
 }
