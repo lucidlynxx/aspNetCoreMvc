@@ -12,23 +12,19 @@ namespace aspNetCoreMvc.Controllers
     public class MoviesController : Controller
     {
         private readonly aspNetCoreMvcContext _context;
-        // implementasi pengambilan data menggunakan stored procedure dan ADO.NET
         private readonly IMovieRepository _movieRepository;
 
         public MoviesController(aspNetCoreMvcContext context, IMovieRepository movieRepository)
         {
             _context = context;
-            // implementasi pengambilan data menggunakan stored procedure dan ADO.NET
             _movieRepository = movieRepository;
         }
 
         // GET: Movies
         public async Task<IActionResult> Index(string movieGenre, string searchString)
         {
-            if (_context.Movie == null)
-            {
+            if (await _movieRepository.IsMovieTableEmptyAsync())
                 return Problem("Entity set 'aspNetCoreMvcContext.Movie' is null.");
-            }
 
             // Use LINQ to get list of genres.
             IQueryable<string> genreQuery = from m in _context.Movie
@@ -187,7 +183,7 @@ namespace aspNetCoreMvc.Controllers
 
         public async Task<IActionResult> DownloadPdf()
         {
-            // implementasi pengambilan data menggunakan stored procedure dan ADO.NET
+            //* implementasi pengambilan data menggunakan stored procedure dan ADO.NET
             List<Movie> movies = await _movieRepository.GetAllMoviesAsync();
 
             var fileName = $"movie_list_{DateTime.Now:yyyy_MM_dd_HH:mm}.pdf";
@@ -201,14 +197,14 @@ namespace aspNetCoreMvc.Controllers
 
         public async Task<IActionResult> DownloadExcel()
         {
-            // implementasi pengambilan data menggunakan stored procedure dan ADO.NET
+            //* implementasi pengambilan data menggunakan stored procedure dan ADO.NET
             List<Movie> movies = await _movieRepository.GetAllMoviesAsync();
 
             using var workbook = new XLWorkbook();
             var worksheet = workbook.Worksheets.Add("Movie List");
             var currentRow = 1;
 
-            // Header
+            //* Header
             worksheet.Cell(currentRow, 1).Value = "No";
             worksheet.Cell(currentRow, 2).Value = "Title";
             worksheet.Cell(currentRow, 3).Value = "Release Date";
@@ -216,7 +212,7 @@ namespace aspNetCoreMvc.Controllers
             worksheet.Cell(currentRow, 5).Value = "Price";
             worksheet.Cell(currentRow, 6).Value = "Rating";
 
-            // Data
+            //* Data
             for (int i = 0; i < movies.Count; i++)
             {
                 currentRow++;
@@ -228,7 +224,7 @@ namespace aspNetCoreMvc.Controllers
                 worksheet.Cell(currentRow, 6).Value = movies[i].Rating;
             }
 
-            // Download
+            //* Download
             using var stream = new MemoryStream();
             workbook.SaveAs(stream);
             stream.Position = 0;
