@@ -26,6 +26,7 @@ namespace aspNetCoreMvc.Controllers
             if (await _movieRepository.IsMovieTableEmptyAsync())
                 return Problem("Entity set 'aspNetCoreMvcContext.Movie' is null.");
 
+            //* implementasi pengambilan data menggunakan stored procedure dan ADO.NET
             List<Movie> movies = await _movieRepository.GetAllMoviesAsync();
 
             List<string> genres = movies.Select(m => m.Genre!).Distinct().ToList();
