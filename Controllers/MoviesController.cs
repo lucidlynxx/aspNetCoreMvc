@@ -26,27 +26,24 @@ namespace aspNetCoreMvc.Controllers
             if (await _movieRepository.IsMovieTableEmptyAsync())
                 return Problem("Entity set 'aspNetCoreMvcContext.Movie' is null.");
 
-            // Use LINQ to get list of genres.
-            IQueryable<string> genreQuery = from m in _context.Movie
-                                            orderby m.Genre
-                                            select m.Genre;
+            List<Movie> movies = await _movieRepository.GetAllMoviesAsync();
 
-            var movies = from m in _context.Movie select m;
+            List<string> genres = movies.Select(m => m.Genre!).Distinct().ToList();
 
             if (!string.IsNullOrEmpty(searchString))
             {
-                movies = movies.Where(s => s.Title!.Contains(searchString));
+                movies = movies.Where(m => m.Title!.Contains(searchString, StringComparison.OrdinalIgnoreCase)).ToList();
             }
 
             if (!string.IsNullOrEmpty(movieGenre))
             {
-                movies = movies.Where(x => x.Genre == movieGenre);
+                movies = movies.Where(m => m.Genre == movieGenre).ToList();
             }
 
             var movieGenreVM = new MovieGenreViewModel
             {
-                Genres = new SelectList(await genreQuery.Distinct().ToListAsync()),
-                Movies = await movies.ToListAsync()
+                Genres = new SelectList(genres),
+                Movies = movies
             };
 
             return View(movieGenreVM);

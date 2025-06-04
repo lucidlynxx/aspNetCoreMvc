@@ -16,32 +16,70 @@ public class MovieRepository : IMovieRepository
         _sqlHelper = new SqlHelper(connectionString!);
     }
 
+    public async Task<List<string>> GetAllGenresAsync()
+    {
+        var genres = new List<string>();
+
+        using (var reader = await _sqlHelper.ExecuteStoredProcedureAsync("GetAllGenres"))
+        {
+            while (await reader.ReadAsync())
+            {
+                genres.Add(reader.GetString(0));
+            }
+        }
+
+        return genres;
+    }
+
     //* implementasi pengambilan data menggunakan stored procedure dan ADO.NET
     public async Task<List<Movie>> GetAllMoviesAsync()
     {
-        return await _sqlHelper.UseConnectionAsync(async connection =>
+        var movies = new List<Movie>();
+
+        using (var reader = await _sqlHelper.ExecuteStoredProcedureAsync("GetAllMovies"))
         {
-            var movies = new List<Movie>();
-            var command = new SqlCommand("GetAllMovies", connection);
-
-            using (var reader = await command.ExecuteReaderAsync())
+            while (await reader.ReadAsync())
             {
-                while (await reader.ReadAsync())
+                movies.Add(new Movie
                 {
-                    movies.Add(new Movie
-                    {
-                        Id = reader.GetInt32(0),
-                        Title = reader.GetString(1),
-                        ReleaseDate = reader.GetDateTime(2),
-                        Genre = reader.GetString(3),
-                        Price = reader.GetDecimal(4),
-                        Rating = reader.GetString(5)
-                    });
-                }
+                    Id = reader.GetInt32(0),
+                    Title = reader.GetString(1),
+                    ReleaseDate = reader.GetDateTime(2),
+                    Genre = reader.GetString(3),
+                    Price = reader.GetDecimal(4),
+                    Rating = reader.GetString(5)
+                });
             }
+        }
 
-            return movies;
-        });
+        return movies;
+    }
+
+    public async Task<List<Movie>> GetMoviesByTitleOrGenreAsync(string searchString)
+    {
+        List<Movie> movies = new List<Movie>();
+
+        using (var reader = await _sqlHelper.ExecutedStoredProcedureAsync("SearchMovie", parameter =>
+        {
+            parameter.AddWithValue("@Title", (object?)searchString ?? DBNull.Value);
+            parameter.AddWithValue("@Genre", (object?)searchString ?? DBNull.Value);
+        }))
+        {
+            while (await reader.ReadAsync())
+            {
+                movies.Add(new Movie
+                {
+                    Id = reader.GetInt32(0),
+                    Title = reader.GetString(1),
+                    ReleaseDate = reader.GetDateTime(2),
+                    Genre = reader.GetString(3),
+                    Price = reader.GetDecimal(4),
+                    Rating = reader.GetString(5)
+                });
+            }
+        }
+
+        return movies;
     }
 
     public async Task<bool> IsMovieTableEmptyAsync()
