@@ -54,16 +54,12 @@ namespace aspNetCoreMvc.Controllers
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
-            {
                 return NotFound();
-            }
 
-            var movie = await _context.Movie
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var movie = await _movieRepository.GetMovieByIdAsync(id);
+
             if (movie == null)
-            {
                 return NotFound();
-            }
 
             return View(movie);
         }

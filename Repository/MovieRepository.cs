@@ -55,7 +55,31 @@ public class MovieRepository : IMovieRepository
         return movies;
     }
 
-    public async Task<List<Movie>> GetMoviesByTitleOrGenreAsync(string searchString)
+    public async Task<Movie> GetMovieByIdAsync(int? id)
+    {
+        Movie movie = new Movie();
+
+        using (var reader = await _sqlHelper.ExecutedStoredProcedureAsync("GetMovieById", parameter =>
+        {
+            parameter.AddWithValue("@Id", (object?)id ?? DBNull.Value);
+        }
+        ))
+        {
+            if (await reader.ReadAsync())
+            {
+                movie.Id = reader.GetInt32(0);
+                movie.Title = reader.GetString(1);
+                movie.ReleaseDate = reader.GetDateTime(2);
+                movie.Genre = reader.GetString(3);
+                movie.Price = reader.GetDecimal(4);
+                movie.Rating = reader.GetString(5);
+            }
+        }
+
+        return movie;
+    }
+
+    public async Task<List<Movie>> GetMoviesByTitleOrGenreAsync(string? searchString)
     {
         List<Movie> movies = new List<Movie>();
 

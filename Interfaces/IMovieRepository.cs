@@ -7,5 +7,6 @@ public interface IMovieRepository
     Task<List<Movie>> GetAllMoviesAsync();
     Task<bool> IsMovieTableEmptyAsync();
     Task<List<string>> GetAllGenresAsync();
-    Task<List<Movie>> GetMoviesByTitleOrGenreAsync(string searchString);
+    Task<List<Movie>> GetMoviesByTitleOrGenreAsync(string? searchString);
+    Task<Movie> GetMovieByIdAsync(int? id);
 }
