@@ -79,10 +79,10 @@ namespace aspNetCoreMvc.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(movie);
-                await _context.SaveChangesAsync();
+                await _movieRepository.CreateMovie(movie);
                 return RedirectToAction(nameof(Index));
             }
+
             return View(movie);
         }
 

@@ -16,6 +16,28 @@ public class MovieRepository : IMovieRepository
         _sqlHelper = new SqlHelper(connectionString!);
     }
 
+    public async Task<bool> CreateMovie(Movie movie)
+    {
+        int movieId = 0;
+
+        using (var reader = await _sqlHelper.ExecutedStoredProcedureAsync("CreateMovie", parameter =>
+        {
+            parameter.AddWithValue("@Title", movie.Title);
+            parameter.AddWithValue("@ReleaseDate", movie.ReleaseDate);
+            parameter.AddWithValue("@Genre", movie.Genre);
+            parameter.AddWithValue("@Price", movie.Price);
+            parameter.AddWithValue("@Rating", movie.Rating);
+        }))
+        {
+            if (await reader.ReadAsync())
+            {
+                movieId = Convert.ToInt32(reader["Id"]);
+            }
+        }
+
+        return movieId > 0;
+    }
+
     public async Task<List<string>> GetAllGenresAsync()
     {
         var genres = new List<string>();
