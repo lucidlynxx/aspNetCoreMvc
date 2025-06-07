@@ -118,7 +118,7 @@ namespace aspNetCoreMvc.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!MovieExists(movie.Id))
+                    if (await _movieRepository.IsAMovieExists(movie.Id))
                     {
                         return NotFound();
                     }
@@ -137,16 +137,12 @@ namespace aspNetCoreMvc.Controllers
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
-            {
                 return NotFound();
-            }
 
-            var movie = await _context.Movie
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var movie = await _context.Movie.FirstOrDefaultAsync(m => m.Id == id);
+
             if (movie == null)
-            {
                 return NotFound();
-            }
 
             return View(movie);
         }
@@ -157,18 +153,13 @@ namespace aspNetCoreMvc.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var movie = await _context.Movie.FindAsync(id);
+
             if (movie != null)
-            {
                 _context.Movie.Remove(movie);
-            }
 
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
 
-        private bool MovieExists(int id)
-        {
-            return _context.Movie.Any(e => e.Id == id);
+            return RedirectToAction(nameof(Index));
         }
 
         public async Task<IActionResult> DownloadPdf()

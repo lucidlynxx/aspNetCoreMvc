@@ -1,3 +1,4 @@
+using System.Data;
 using aspNetCoreMvc.Helper;
 using aspNetCoreMvc.Interfaces;
 using aspNetCoreMvc.Models;
@@ -126,6 +127,25 @@ public class MovieRepository : IMovieRepository
         }
 
         return movies;
+    }
+
+    public async Task<bool> IsAMovieExists(int? id)
+    {
+        bool exists = false;
+
+        await _sqlHelper.UseConnectionAsync(async connection =>
+        {
+            using (var command = new SqlCommand("CheckMovieExists", connection))
+            {
+                command.CommandType = CommandType.StoredProcedure;
+                command.Parameters.AddWithValue("@Id", (object?)id ?? DBNull.Value);
+
+                var result = await command.ExecuteScalarAsync();
+                exists = result != null && Convert.ToBoolean(result);
+            }
+        });
+
+        return exists;
     }
 
     public async Task<bool> IsMovieTableEmptyAsync()
