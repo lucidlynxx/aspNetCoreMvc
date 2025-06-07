@@ -12,4 +12,5 @@ public interface IMovieRepository
     Task<bool> CreateMovie(Movie movie);
     Task<bool> UpdateMovie(Movie movie);
     Task<bool> IsAMovieExists(int? id);
+    Task<bool> DeleteMovie(int? id);
 }

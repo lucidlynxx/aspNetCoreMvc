@@ -39,6 +39,24 @@ public class MovieRepository : IMovieRepository
         return movieId > 0;
     }
 
+    public async Task<bool> DeleteMovie(int? id)
+    {
+        int affectedRows = 0;
+
+        await _sqlHelper.UseConnectionAsync(async connection =>
+        {
+            using (var command = new SqlCommand("DeleteMovie", connection))
+            {
+                command.CommandType = CommandType.StoredProcedure;
+                command.Parameters.AddWithValue("@Id", (object?)id ?? DBNull.Value);
+
+                affectedRows = await command.ExecuteNonQueryAsync();
+            }
+        });
+
+        return affectedRows > 0; //* true jika ada baris yang terhapus
+    }
+
     public async Task<List<string>> GetAllGenresAsync()
     {
         var genres = new List<string>();

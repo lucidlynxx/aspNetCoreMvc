@@ -11,12 +11,10 @@ namespace aspNetCoreMvc.Controllers
 {
     public class MoviesController : Controller
     {
-        private readonly aspNetCoreMvcContext _context;
         private readonly IMovieRepository _movieRepository;
 
-        public MoviesController(aspNetCoreMvcContext context, IMovieRepository movieRepository)
+        public MoviesController(IMovieRepository movieRepository)
         {
-            _context = context;
             _movieRepository = movieRepository;
         }
 
@@ -139,7 +137,7 @@ namespace aspNetCoreMvc.Controllers
             if (id == null)
                 return NotFound();
 
-            var movie = await _context.Movie.FirstOrDefaultAsync(m => m.Id == id);
+            var movie = await _movieRepository.GetMovieByIdAsync(id);
 
             if (movie == null)
                 return NotFound();
@@ -152,12 +150,10 @@ namespace aspNetCoreMvc.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var movie = await _context.Movie.FindAsync(id);
+            var movie = await _movieRepository.GetMovieByIdAsync(id);
 
             if (movie != null)
-                _context.Movie.Remove(movie);
-
-            await _context.SaveChangesAsync();
+                await _movieRepository.DeleteMovie(movie.Id);
 
             return RedirectToAction(nameof(Index));
         }
