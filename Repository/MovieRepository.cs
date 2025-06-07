@@ -137,4 +137,27 @@ public class MovieRepository : IMovieRepository
             return (int)count! == 0;
         });
     }
+
+    public async Task<bool> UpdateMovie(Movie movie)
+    {
+        int movieId = 0;
+
+        using (var reader = await _sqlHelper.ExecutedStoredProcedureAsync("UpdateMovie", parameter =>
+        {
+            parameter.AddWithValue("@Id", movie.Id);
+            parameter.AddWithValue("@Title", movie.Title);
+            parameter.AddWithValue("@ReleaseDate", movie.ReleaseDate);
+            parameter.AddWithValue("@Genre", movie.Genre);
+            parameter.AddWithValue("@Price", movie.Price);
+            parameter.AddWithValue("@Rating", movie.Rating);
+        }))
+        {
+            if (await reader.ReadAsync())
+            {
+                movieId = Convert.ToInt32(reader["Id"]);
+            }
+        }
+
+        return movieId > 0;
+    }
 }

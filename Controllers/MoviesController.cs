@@ -90,15 +90,13 @@ namespace aspNetCoreMvc.Controllers
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
-            {
                 return NotFound();
-            }
 
-            var movie = await _context.Movie.FindAsync(id);
+            Movie movie = await _movieRepository.GetMovieByIdAsync(id);
+
             if (movie == null)
-            {
                 return NotFound();
-            }
+
             return View(movie);
         }
 
@@ -110,16 +108,13 @@ namespace aspNetCoreMvc.Controllers
         public async Task<IActionResult> Edit(int id, [Bind("Id,Title,ReleaseDate,Genre,Price,Rating")] Movie movie)
         {
             if (id != movie.Id)
-            {
                 return NotFound();
-            }
 
             if (ModelState.IsValid)
             {
                 try
                 {
-                    _context.Update(movie);
-                    await _context.SaveChangesAsync();
+                    await _movieRepository.UpdateMovie(movie);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -134,6 +129,7 @@ namespace aspNetCoreMvc.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
+
             return View(movie);
         }
 

@@ -10,4 +10,5 @@ public interface IMovieRepository
     Task<List<Movie>> GetMoviesByTitleOrGenreAsync(string? searchString);
     Task<Movie> GetMovieByIdAsync(int? id);
     Task<bool> CreateMovie(Movie movie);
+    Task<bool> UpdateMovie(Movie movie);
 }
